@@ -7,7 +7,7 @@ using System;
 
 public class VersionManager
 {
-    public VersionManager(string configuration, string versionsJsonFileName = "Versions.{0}.json", string versionsPropsFileName = "Versions.{0}.props")
+    public VersionManager(string configuration, string versionsJsonFileName = "Packages/JustinWritesCode.Versions.{0}.json", string versionsPropsFileName = "Packages/JustinWritesCode.Versions.{0}.props")
     {
         Configuration = configuration;
         VersionsJsonFileName = versionsJsonFileName;
@@ -24,7 +24,6 @@ public class VersionManager
         System.IO.File.ReadAllText(VersionsJsonFilePath));
     }
 
-
     private void SaveVersions()
     {
         var sortedVersions = Versions.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
@@ -38,8 +37,8 @@ public class VersionManager
             sortedVersions.Select(kvp => new XElement(kvp.Key.Replace(".", "").Replace("-", "") + "Version", kvp.Value))));
         root.Add(new XElement("ItemGroup",
             sortedVersions.Select(kvp =>
-                new XElement("PackageVersion",
-                    new XAttribute("Include", kvp.Key),
+                new XElement("PackageReference",
+                    new XAttribute("Update", kvp.Key),
                     new XAttribute("Version", $"$({kvp.Key.Replace(".", "").Replace("-", "")}Version)")))));
         versionsProps.Save(VersionsPropsFilePath);
     }
@@ -67,6 +66,40 @@ public class VersionManager
         }
 
         return Path.Combine(directoryInfo.FullName, fileName);
+    }
+
+    public static string GetDirectoryNameOfFileAbove(string startingDirectory, string fileName)
+    {
+        var currentDirectory = startingDirectory;
+        var directoryInfo = new DirectoryInfo(currentDirectory);
+        var lookingForFile = new FileInfo(Path.Combine(directoryInfo.FullName, fileName));
+        var lookingForDirectory = new DirectoryInfo(Path.Combine(directoryInfo.FullName, fileName));
+        while (directoryInfo != null && !lookingForFile.Exists && !lookingForDirectory.Exists)
+        {
+            directoryInfo = directoryInfo.Parent;
+            lookingForFile = new FileInfo(Path.Combine(directoryInfo.FullName, fileName));
+            lookingForDirectory = new DirectoryInfo(Path.Combine(directoryInfo.FullName, fileName));
+        }
+
+        return directoryInfo.FullName;
+    }
+
+    public static string GetPathOfRootDirectory(DirectoryInfo currentDirectory, string lookingForDirectoryName, DirectoryInfo lastDirectoryWhereTheThingWasFound = default)
+    {
+        Console.WriteLine($"Looking for {lookingForDirectoryName} in {currentDirectory.FullName}");
+        if (currentDirectory == null)
+        {
+            return lastDirectoryWhereTheThingWasFound.FullName;
+        }
+        else if (currentDirectory.Name == lookingForDirectoryName)
+        {
+            return currentDirectory.FullName;
+        }
+        else if (currentDirectory.GetFileSystemInfos(lookingForDirectoryName).Any())
+        {
+            lastDirectoryWhereTheThingWasFound = new DirectoryInfo(currentDirectory.GetFileSystemInfos(lookingForDirectoryName).First().FullName);
+        }
+        return GetPathOfRootDirectory(currentDirectory.Parent, lookingForDirectoryName, currentDirectory);
     }
 
     public string GetVersion(string packageName)

@@ -1,8 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <IncludeInSolutionFile>false</IncludeInSolutionFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="./Versioning/JustinWritesCode.Versioning.csproj" />
-  </ItemGroup>
-</Project>

@@ -4,7 +4,6 @@
     <Title>JustinWritesCode Version Synchronizer</Title>
     <Description>Keeps central version records in sync with the repos</Description>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <!-- <MinVerTagPrefix>bvv</MinVerTagPrefix> -->
   </PropertyGroup>
 <ItemGroup>
   <Using Include="Microsoft.Build.Utilities.Task" Alias="MSBTask" />
@@ -14,13 +13,13 @@
   <PackageReference Include="Microsoft.Build.Utilities.Core" />
  </ItemGroup>
  <ItemGroup>
-  <PackageFile Include="./Build/JustinWritesCode.Versioning.targets" PackagePath="build/JustinWritesCode.Versioning.targets" />
-  <PackageFile Include="$(OutputPath)JustinWritesCode.Versioning.*" PackagePath="lib/%(Filename)%(Extension)" />
+  <PackageFile Include="./Build/CentralVersioning.targets" PackagePath="build/$(PackageId).targets" />
+  <PackageFile Include="$(OutputPath)$(AssemblyName).*" PackagePath="lib/%(Filename)%(Extension)" />
  </ItemGroup>
  <UsingTask TaskName="SaveVersionNumberCentrally" AssemblyFile="$(OutputPath)$(AssemblyName).dll" />
- <Target Name="SaveVersionNumberCentrally" AfterTargets="Pack">
+ <Target Name="SaveVersionNumberCentrally" AfterTargets="Build,Pack">
   <SaveVersionNumberCentrally
-      PackageName="$(MSBuildProjectName)"
+      PackageName="$(PackageId)"
       Version="$(PackageVersion)"
       Configuration="$(Configuration)" />
  </Target>

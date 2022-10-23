@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <PropertyGroup>
+    <IncludeInSolutionFile>false</IncludeInSolutionFile>
+    <SlnGenFolders>true</SlnGenFolders>
+    <EnableDefaultProjectItems>false</EnableDefaultProjectItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="./src/CentralVersioning/CentralVersioning.csproj" />
+  </ItemGroup>
+</Project>
